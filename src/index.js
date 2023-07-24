@@ -1,13 +1,18 @@
 import express from "express";
-import { createTable } from "./config/sql.js";
+import pool, { createTable } from "./config/sql.js";
 
 const app = express();
 
 const serverStart = () => {
-  app.get("/", (req, res) => {
-    return res.status(200).json({
-      message: "it works",
-    });
+  app.get("/api/products", async (_, res) => {
+    try {
+      const query = await pool.query("SELECT * from products");
+      const rows = query.rows;
+
+      return res.status(200).json(rows);
+    } catch (error) {
+      return res.status(400).json(error);
+    }
   });
   app.listen(3000);
 };
