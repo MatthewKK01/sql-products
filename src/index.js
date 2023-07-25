@@ -17,6 +17,10 @@ const Init = async () => {
 const serverStart = () => {
   app.use(cors());
   app.use(bodyParser.json);
+  app.get("/", async (res, req) => {
+    return res.send("<h1>Welcome to my API</h1>");
+  });
+
   app.get("/api/products", async (_, res) => {
     try {
       const query = await pool.query("SELECT * from products");
