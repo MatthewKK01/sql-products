@@ -2,35 +2,20 @@ import express from "express";
 import pool, { createTable } from "./config/sql.js";
 import bodyParser from "body-parser";
 import cors from "cors";
+import {
+  createProduct,
+  deleteProduct,
+  getProduct,
+} from "./controllers/productController.js";
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
 const serverStart = () => {
-  app.get("/api/products", async (_, res) => {
-    try {
-      const query = await pool.query("SELECT * from products");
-      const rows = query.rows;
-
-      return res.status(200).json(rows);
-    } catch (error) {
-      return res.status(400).json(error);
-    }
-  });
-  app.post("/api/products", async (req, res) => {
-    const { title, price } = req.body;
-    try {
-      const query = await pool.query(
-        "INSERT INTO products(title, price) VALUES ($1, $2)",
-        [title, price]
-      );
-      const row = query.rows[0];
-      return res.status(201).json(row);
-    } catch (error) {
-      return res.status(401).json(error);
-    }
-  });
+  app.get("/api/products", getProduct);
+  app.post("/api/products", createProduct);
+  app.delete("/api/products:id", deleteProduct);
   app.listen(3000);
 };
 
