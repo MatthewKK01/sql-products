@@ -1,16 +1,26 @@
 import express from "express";
 import pool, { createTable } from "./config/sql.js";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 const app = express();
-app.use(bodyParser.json);
+
+const Init = async () => {
+  try {
+    await createTable();
+    serverStart();
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const serverStart = () => {
+  app.use(cors());
+  app.use(bodyParser.json);
   app.get("/api/products", async (_, res) => {
     try {
       const query = await pool.query("SELECT * from products");
       const rows = query.rows;
-
       return res.status(200).json(rows);
     } catch (error) {
       return res.status(400).json(error);
@@ -23,22 +33,13 @@ const serverStart = () => {
         "INSERT INTO products(title, price) VALUES ($1, $2)",
         [title, price]
       );
-      const rows = query.rows[0];
-      return res.status(200).json(rows);
+      const row = query.rows[0];
+      return res.status(201).json(row);
     } catch (error) {
-      return res.json(error);
+      return res.status(401).json(error);
     }
   });
   app.listen(3000);
-};
-
-const Init = async () => {
-  try {
-    await createTable();
-    serverStart();
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 Init();
