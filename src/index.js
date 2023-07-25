@@ -25,7 +25,9 @@ const serverStart = () => {
       );
       const rows = query.rows[0];
       return res.status(200).json(rows);
-    } catch (error) {}
+    } catch (error) {
+      return res.json(error);
+    }
   });
   app.listen(3000);
 };
